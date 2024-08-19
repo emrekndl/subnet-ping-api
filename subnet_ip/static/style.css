@@ -1,0 +1,38 @@
+tr.htmx-swapping td {
+  opacity: 0;
+  transition: opacity 1s ease-out;
+}
+
+table {
+  table-layout: auto;
+}
+
+td,
+th {
+  text-align: center;
+  vertical-align: middle;
+  word-wrap: break-word;
+  position: relative;
+}
+
+/* td:last-child { */
+/*   min-width: 150px; */
+/* } */
+
+.table td {
+  vertical-align: middle;
+}
+/* #error-message { */
+/*   animation: fadeOut 3s forwards; */
+/* } */
+/**/
+/* @keyframes fadeOut { */
+/*   0% { */
+/*     opacity: 1; */
+/*   visibility: visible; */
+/*   } */
+/*   100% { */
+/*     opacity: 0; */
+/*   visibility: hidden; */
+/*   } */
+/* } */

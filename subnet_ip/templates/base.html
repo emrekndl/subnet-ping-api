@@ -1,0 +1,43 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.4/css/bulma.min.css"
+    integrity="sha512-HqxHUkJM0SYcbvxUw5P60SzdOTy/QVwA1JJrvaXJv4q7lmbDZCmZaqz01UPOaQveoxfYRv1tHozWGPMcuTBuvQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js"></script>
+  <script src="https://unpkg.com/htmx.org@2.0.1"
+    integrity="sha384-QWGpdj554B4ETpJJC9z+ZHJcA/i59TyjxEPXiiUgN2WmTyV5OEZWCD6gQhgkdpB/"
+    crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/simple-notifications-solution/dist/Notifications.js"></script>
+  <script src="{% static 'main.js' %}"></script>
+  <link rel="stylesheet" href="https://unpkg.com/simple-notifications-solution/dist/Notifications.css">
+  <link rel="stylesheet" href="{% static 'style.css' %}">
+  <title>Subnet Ping</title>
+</head>
+
+<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+
+
+  <div class="section m-auto">
+    <div class="container">
+      <div class="columns is-multiline is-mobile has-text-centered">
+
+        <div class="column">
+          <center>
+              <div class="container mt-4">
+                {% block content %}
+                {% endblock %}
+                </div>
+      </center>
+    </div>
+  </div>
+  </div>
+  </div>
+</body>
+
+</html>

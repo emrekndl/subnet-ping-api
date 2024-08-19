@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="section m-auto">
+  <div class="columns is-centered">
+    <div class="column is-half">
+      <nav class="panel is-success">
+
+        <p class="panel-heading">
+          <span class="icon">
+
+           <!-- <a href="{% url 'index' %}"> -->
+            <button type="button" class="button is-success" hx-get="{% url 'index' %}" hx-swap="outerHTML"
+              hx-target=".section">
+              <span class="icon is-small">
+                <i class="fas fa-chevron-circle-left" aria-hidden="true"></i>
+              </span>
+            </button>
+          </span> &nbsp;
+          Subnet Ping Pong
+        </p>
+        <div class="panel-block">
+          <div class="block m-auto">
+            <div class="field is-grouped">
+              <p class="control has-icons-left is-bold">
+                <span class=" is-left has-text-success has-text-weight-bold">
+                  {{ data.0.subnet }}
+                </span><br>
+                <span>
+                  {{ data.0.update_date|timesince }} ago updated.
+                </span>
+                <br>
+              </p>
+            </div>
+          </div>
+        </div>
+        <div id="panel">
+          <table class="table is-narrow is-hoverable is-fullwidth">
+            <thead>
+              <tr>
+                <th>subnet</th>
+                <th>status</th>
+                <th>create date</th>
+                <th>update date</th>
+              </tr>
+            </thead>
+            {% for ip in data %}
+            <tbody>
+              <tr>
+                <td class="has-text-weight-bold">{{ ip.subnet }}</td>
+                {% if ip.status == 1%}
+                <td class="has-text-success">active</td>
+                {% elif ip.status == 0%}
+                <td class="has-text-warning-dark">inactive</td>
+                {% endif %}
+                <td>{{ ip.create_date }}</td>
+                <td>{{ ip.update_date|timesince }} ago</td>
+              </tr>
+            </tbody>
+            {% endfor %}
+
+          </table>
+
+        </div>
+      </nav>
+    </div>
+  </div>
+</section>
+{% endblock %}

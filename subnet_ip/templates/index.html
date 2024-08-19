@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<form >
+  {% csrf_token %}
+        <nav class="panel is-success is-fullwidth">
+          <p class="panel-heading">Subnet Ping Pong</p>
+          <div class="panel-block">
+            <div class="block m-auto">
+              <div class="field is-grouped">
+                <p class="control has-icons-left">
+                  <input class="input is-success" type="search" placeholder="" name="ip" id="search" autocomplete="on" />
+                  <span class="icon is-left has-text-success">
+                    <i class="fas fa-search" aria-hidden="true"></i>
+                  </span>
+                </p>
+                <div class="control">
+                  <button type="submit" class="button is-primary" id="search-btn"
+                      hx-post="{% url 'index' %}" hx-swap="outerHTML" hx-target=".section">PING</button>
+                      <!-- hx-post="{% url 'index' %}" hx-swap="outerHTML" hx-target=".section">PING</button> -->
+                    <!-- hx-post="/api/ip/" hx-swap="none">PING</button> -->
+                    <!-- >PING</button> -->
+                  <!-- <button type="button" hx-get="{% url 'index' %}" hx-trigger="click" hx-swap="outerHTML" hx-target=".section">TEST </button> -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </nav>
+</form>
+<div id="panel" class="table-container">
+  {% if error %}
+  <p class="notification is-danger has-text-white has-text-weight-semibold" data-close="self" >
+    {{error.error}}
+  </p>
+  {% endif %}
+  <table class="table is-narrow is-hoverable is-fullwidth">
+    <tbody>
+      {% for ip in ip_list %}
+      <tr>
+        <td class="has-text-weight-bold">{{ ip.ip }}</td>
+        <td><button class="button is-info is-outlined" hx-get="{% url 'subnet' pk=ip.id %}" hx-target=".section"
+            hx-swap="outerHTML"><span>INFO</span>
+            <span class="icon is-small">
+              <i class="fa fa-info-circle "></i>
+            </span></button>
+        </td>
+        <td><button class="button is-danger is-outlined" hx-delete="/api/ip/prefix/{{ ip.id }}" hx-target="closest tr"
+            hx-swap="outerHTML swap:1s"><span>Delete</span>
+            <span class="icon is-small">
+              <i class="fas fa-times"></i>
+            </span></button></td>
+        <td id="state-{{ ip.id }}">
+          {% if ip.ping_task_state == "PENDING" %}
+          <span class="has-text-warning-dark">
+          <i class="fas fa-circle-notch fa-spin"></i>
+          {{ ip.ping_task_state }}
+          </span>
+
+          <div hx-get="{% url 'ip-state' pk=ip.id %}" hx-target="#state-{{ ip.id }}" hx-trigger="every 5s"> </div>
+          {% else %}
+          
+          <span class="has-text-success">
+            <i class="fas fa-check-circle"></i>
+            {{ip.ping_task_state}}<br>
+            {{ip.update_date|timesince }} ago updated.
+          </span>
+
+          {% endif %}
+</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

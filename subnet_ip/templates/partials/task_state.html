@@ -1,0 +1,14 @@
+{% load static %}
+{% if ip.state == "PENDING" %}
+<span class="has-text-warning-dark">
+	<i class="fas fa-circle-notch fa-spin"></i>
+	{{ ip.state }}
+</span>
+{% else %}
+<span class="has-text-success">
+	<i class="fas fa-check-circle"></i>
+	{{ ip.state }}<br>
+	{{ ip.updated|timesince }} ago updated.
+
+</span>
+{% endif %}

@@ -1,0 +1,109 @@
+version: '3.4'
+
+services:
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    networks:
+      default:
+        ipv4_address: 172.16.0.3
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    # network_mode: "host"
+    networks:
+      default:
+        ipv4_address: 172.16.0.4
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+      - RABBITMQ_DEFAULT_VHOST=/
+    # command: >
+    #   bash -c "
+    #       rabbitmq-server -detached &&
+    #       until rabbitmqctl await_startup; do sleep 1; done &&
+    #       rabbitmqctl add_user myuser mypassword &&
+    #       rabbitmqctl add_vhost myvhost &&
+    #       rabbitmqctl set_user_tags myuser mytag &&
+    #       rabbitmqctl set_permissions -p myvhost myuser '.*' '.*' '.*' &&
+    #       rabbitmqctl stop &&
+    #       rabbitmq-server
+    #       "
+    # healthcheck:
+    #     test: ["CMD", "rabbitmqctl", "status"]
+    #     interval: 30s
+    #     timeout: 10s
+    #     retries: 5
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      default:
+        ipv4_address: 172.16.0.3
+    dns:
+        - 8.8.8.8
+        - 8.8.4.4
+    command: gunicorn subnet_ip_app.wsgi:application --bind 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      DEBUG: ${DEBUG}
+      SECRET_KEY: ${SECRET_KEY}
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS}
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_LOCATION: ${REDIS_LOCATION}
+      CELERY_BROKER_URL: ${CELERY_BROKER_URL}
+      CELERY_RESULT_BACKEND: ${CELERY_RESULT_BACKEND}
+      URL: ${URL}
+      IPV4_PREFIXLEN: ${IPV4_PREFIXLEN}
+      IPV6_PREFIXLEN: ${IPV6_PREFIXLEN}
+      IPV6_PREFIXLEN_2: ${IPV6_PREFIXLEN_2}
+      CACHE_TTL: ${CACHE_TTL}
+      LOG_LEVEL: ${LOG_LEVEL}
+      LOG_FILE: ${LOG_FILE}
+    depends_on:
+      - redis
+      - rabbitmq
+
+  celery:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      default:
+        ipv4_address: 172.16.0.2
+    dns:
+        - 8.8.8.8
+        - 8.8.4.4
+    # command: celery -A subnet_ip_app worker -l ${LOG_LEVEL} -Q queue1
+    command: ["sh", "-c", "/wait-for-it.sh rabbitmq:5672 -- celery -A subnet_ip_app worker -l ${LOG_LEVEL} -Q queue1"]
+    volumes:
+      - .:/app
+    environment:
+      CELERY_BROKER_URL: ${CELERY_BROKER_URL}
+      CELERY_RESULT_BACKEND: ${CELERY_RESULT_BACKEND}
+    depends_on:
+      - redis
+      - rabbitmq
+      # rabbitmq:
+      #   condition: service_healthy
+networks:
+    default:
+        driver: bridge
+        ipam:
+            config:
+                - subnet: "172.16.0.0/16"

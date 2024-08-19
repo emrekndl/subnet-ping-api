@@ -1,0 +1,83 @@
+version: '3.4'
+
+services:
+  redis:
+    container_name: subnet_ping_api_redis_1
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    networks:
+      - default
+
+  rabbitmq:
+    container_name: subnet_ping_api_rabbitmq_1
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - default
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+      - RABBITMQ_DEFAULT_VHOST=/
+
+  web:
+    container_name: subnet_ping_api_web_1
+    build:
+      context: .
+      dockerfile: Dockerfile
+    security_opt:
+      - seccomp:unconfined
+    cap_add:
+      - NET_RAW
+    networks:
+      - default
+    command: gunicorn subnet_ip_app.wsgi:application --bind 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      DEBUG: ${DEBUG}
+      SECRET_KEY: ${SECRET_KEY}
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS}
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_LOCATION: ${REDIS_LOCATION}
+      CELERY_BROKER_URL: ${CELERY_BROKER_URL}
+      CELERY_RESULT_BACKEND: ${CELERY_RESULT_BACKEND}
+      URL: ${URL}
+      IPV4_PREFIXLEN: ${IPV4_PREFIXLEN}
+      IPV6_PREFIXLEN: ${IPV6_PREFIXLEN}
+      IPV6_PREFIXLEN_2: ${IPV6_PREFIXLEN_2}
+      CACHE_TTL: ${CACHE_TTL}
+      LOG_LEVEL: ${LOG_LEVEL}
+      LOG_FILE: ${LOG_FILE}
+    depends_on:
+      - redis
+      - rabbitmq
+
+  celery:
+    container_name: subnet_ping_api_celery_1
+    build:
+      context: .
+      dockerfile: Dockerfile
+    security_opt:
+      - seccomp:unconfined
+    cap_add:
+      - NET_RAW
+    networks:
+      - default
+    command: ["sh", "-c", "/wait-for-it.sh rabbitmq:5672 -- celery -A subnet_ip_app worker -l ${LOG_LEVEL} -E -Q queue1"]
+    volumes:
+      - .:/app
+    environment:
+      CELERY_BROKER_URL: ${CELERY_BROKER_URL}
+      CELERY_RESULT_BACKEND: ${CELERY_RESULT_BACKEND}
+    depends_on:
+      - redis
+      - rabbitmq
+
+networks:
+    default:
+        driver: bridge

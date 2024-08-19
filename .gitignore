@@ -1,0 +1,79 @@
+# Python bytecode dosyaları
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+
+# Django
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pyd
+db.sqlite3
+media/
+
+# Environments
+.env
+
+# virtualenv
+venv/
+ENV/
+env/
+.venv/
+.ENV/
+
+# MacOS
+.DS_Store
+
+# VSCode
+.vscode/
+
+# PyCharm
+.idea/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# Node modules (if you use npm/yarn)
+node_modules/
+
+# Other
+*.bak
+*.swp
+*.swo
+*.swn
+*.pid
+*.seed
+*.sqlite3
+*.pkl
+*.log
+*.pot
+*.mo
+*.cover
+*.coverage
+*.hypothesis/
+*.tox/
+*.nox/
+*.coverage.*
+*.cache
+*.mypy_cache/
+*.pylint.d/
+*.pytest_cache/
+*.mypy_cache/
+*.coverage
+*.coverage.*
+*.cache
+*.tox/
+*.nox/
+*.coverage
+*.hypothesis/
+*.nox/
+*.coverage
+*.coverage.*
+*.mypy_cache/
+*.pytest_cache/
+*.mypy_cache/
+dump.rdb
+
+
